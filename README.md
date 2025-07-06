@@ -15,6 +15,6 @@
 * `cd bgfx`
 * `emmake make wasm-debug #it will probably error out on one of the examples, this is fine. just make sure bgfxDebug.bc, bxDebug.bc, and bimgDebug.bc exist in bgfx/.build/wasm/bin/`
 * `cd ..`
-* `emcmake cmake -B buildwasm`
+* ` emcmake cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1`
 * `cd buildwasm`
 * `emmake make`

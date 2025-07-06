@@ -1,0 +1,56 @@
+[
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\main.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\main.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\main.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\main.cpp.o"
+  },
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\common\\cube_atlas.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\common\\cube_atlas.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\common\\cube_atlas.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\common\\cube_atlas.cpp.o"
+  },
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\common\\font\\font_manager.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\common\\font\\font_manager.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\common\\font\\font_manager.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\common\\font\\font_manager.cpp.o"
+  },
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\common\\font\\text_buffer_manager.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\common\\font\\text_buffer_manager.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\common\\font\\text_buffer_manager.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\common\\font\\text_buffer_manager.cpp.o"
+  },
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\common\\font\\text_metrics.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\common\\font\\text_metrics.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\common\\font\\text_metrics.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\common\\font\\text_metrics.cpp.o"
+  },
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\common\\font\\utf8.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\common\\font\\utf8.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\common\\font\\utf8.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\common\\font\\utf8.cpp.o"
+  },
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\common\\entry\\cmd.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\common\\entry\\cmd.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\common\\entry\\cmd.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\common\\entry\\cmd.cpp.o"
+  },
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\common\\entry\\entry.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\common\\entry\\entry.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\common\\entry\\entry.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\common\\entry\\entry.cpp.o"
+  },
+  {
+    "directory": "E:/wasmWorkspace/wasm-3d/build",
+    "command": "E:\\mysys2\\home\\Songyux\\emsdk\\upstream\\emscripten\\em++.bat -DBX_CONFIG_DEBUG -IE:/mysys2/home/Songyux/emsdk/upstream/emscripten/system/include -IE:/wasmWorkspace/wasm-3d/bgfx/include -IE:/wasmWorkspace/wasm-3d/bx/include -IE:/wasmWorkspace/wasm-3d/bimg/include -IE:/wasmWorkspace/wasm-3d/thirdparty -IE:/wasmWorkspace/wasm-3d/glm/glm \n        -s USE_WEBGL2=1         -s FULL_ES3=1         --preload-file special_elite.ttf         --bind         --use-preload-plugins         -Wall         -Wextra         -Werror=return-type         -w         -g4         -Os         --no-heap-copy         -s GL_ENABLE_GET_PROC_ADDRESS         -s FETCH=1         -static         -s ALLOW_MEMORY_GROWTH=1         -s EXIT_RUNTIME=1        -sASSERTIONS -O3 -DNDEBUG -std=gnu++14 -Werror -o CMakeFiles\\wasm-3d.dir\\common\\entry\\input.cpp.o -c E:\\wasmWorkspace\\wasm-3d\\common\\entry\\input.cpp",
+    "file": "E:\\wasmWorkspace\\wasm-3d\\common\\entry\\input.cpp",
+    "output": "CMakeFiles\\wasm-3d.dir\\common\\entry\\input.cpp.o"
+  }
+  ]

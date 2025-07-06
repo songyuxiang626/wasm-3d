@@ -9,3 +9,7 @@
 out/
 
 buildwasm/
+
+build/
+
+.cache/

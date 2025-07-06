@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <fstream>
-
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
 #include <bx/math.h>
