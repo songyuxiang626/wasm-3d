@@ -63,31 +63,31 @@ public:
     }
 
 	static constexpr bool rayIntersect(
-		const glm::vec3& v1,
-		const glm::vec3& v2,
-		const glm::vec3& v3,
+		const bx::Vec3& v1,
+		const bx::Vec3& v2,
+		const bx::Vec3& v3,
 		const Ray& ray,
 		float& u,
 		float& v,
 		float& t
 	) {
-		glm::vec3 edge1 = v2 - v1;
-		glm::vec3 edge2 = v3 - v1;
-		glm::vec3 pvec = glm::cross(ray.d, edge2);
-		float det = glm::dot(edge1, pvec);
+		bx::Vec3 edge1 = bx::sub(v2, v1);
+		bx::Vec3 edge2 = bx::sub(v3, v1);
+		bx::Vec3 pvec = bx::cross(ray.d, edge2);
+		float det = bx::dot(edge1, pvec);
 
 		if (det > -1e-8f && det < 1e-8f)
 			return false;
 		float inv_det = 1.0f / det;
-		glm::vec3 tvec = ray.o - v1;
-		u = glm::dot(tvec, pvec) * inv_det;
+		bx::Vec3 tvec = bx::sub(ray.o, v1);
+		u = bx::dot(tvec, pvec) * inv_det;
 		if (u < 0.0 || u > 1.0)
 			return false;
-		glm::vec3 qvec = glm::cross(tvec, edge1);
-		v = glm::dot(ray.d, qvec) * inv_det;
+		bx::Vec3 qvec = bx::cross(tvec, edge1);
+		v = bx::dot(ray.d, qvec) * inv_det;
 		if (v < 0.0 || u + v > 1.0)
 			return false;
-		t = glm::dot(edge2, qvec) * inv_det;
+		t = bx::dot(edge2, qvec) * inv_det;
 
 		return true;
 	}

@@ -4,20 +4,18 @@
 #include <bx/readerwriter.h>
 #include <bx/file.h>
 
+#include <cstdint>
 #include <emscripten.h>
 #include <emscripten/fetch.h>
 #include <emscripten/val.h>
 #include <emscripten/bind.h>
-
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
 
 #include "./PlaneGeometry.cpp"
 #include "./MeshBasicMaterial.cpp"
 #include "./Utils.cpp"
 #include "./Node.cpp"
 #include "./Ray.cpp"
+#include "bx/float4x4_t.h"
 #include <set>
 
 #include <bimg/bimg.h>
@@ -32,18 +30,15 @@
 #include "common/cube_atlas.h"
 #include "common/entry/entry.h"
 
+// 全局变量
 int screenWidth = 1280;
 int screenHeight = 720;
-float aspectRatio = (float)screenWidth / (float)screenHeight;
-const int m_sideSize = 11;
-const bx::Vec3 at = { 0.0f, 0.0f,  0.0f };
-const bx::Vec3 eye = { 0.0f, 0.0f, 5.0f };
-const float FIXED_WORLD_HEIGHT = 100;
-glm::mat4 view = glm::lookAt(glm::vec3(eye.x, eye.y, eye.z), glm::vec3(at.x, at.y, at.z), glm::vec3(0.0f, 1.0f, 0.0f));
-glm::mat4 projection = glm::ortho(-(FIXED_WORLD_HEIGHT * aspectRatio / 2.0f), FIXED_WORLD_HEIGHT * aspectRatio / 2.0f, -(FIXED_WORLD_HEIGHT / 2.0f), FIXED_WORLD_HEIGHT / 2.0f, .1f, 1000.0f);
-glm::mat4 textProjection = glm::ortho(-(FIXED_WORLD_HEIGHT * aspectRatio / 2.0f), FIXED_WORLD_HEIGHT * aspectRatio / 2.0f, FIXED_WORLD_HEIGHT / 2.0f , -(FIXED_WORLD_HEIGHT / 2.0f), .1f, 1000.0f);
-glm::mat4 viewInverse = glm::inverse(view);
-glm::mat4 projectionInverse = glm::inverse(projection);
+
+float* view_matrix = nullptr;
+float* projection_matrix = nullptr;
+float viewInverse_matrix[16];
+float projectionInverse_matrix[16];
+float* textProjection_matrix = nullptr;
 
 std::set<Node> nodes;
 
@@ -92,33 +87,34 @@ void downloadFailed(emscripten_fetch_t * fetch) {
 void renderFrame() {
     bgfx::touch(0);    
 
-    viewInverse = glm::inverse(view);
-    projectionInverse = glm::inverse(projection);
-    bgfx::setViewTransform(1, glm::value_ptr(view), glm::value_ptr(textProjection));
+    bx::mtxInverse(viewInverse_matrix, view_matrix);
+    bx::mtxInverse(projectionInverse_matrix, projection_matrix);
+    bgfx::setViewTransform(1, view_matrix, textProjection_matrix);
     TextRectangle rectangle = m_textBufferManager->getRectangle(m_scrollableBuffer);
     float textAreaWidth = rectangle.width;
-    glm::mat4 model_matrix = glm::translate(glm::mat4(1.f), glm::vec3(
-        -textAreaWidth*0.5,
-        -m_lineCount*m_metrics.getLineHeight()*0.5,
-        0.)
-    );
+    
+    float model_matrix[16];
+    bx::mtxIdentity(model_matrix);
+    float translation[16];
+    bx::mtxTranslate(translation, -textAreaWidth*0.5f, -m_lineCount*m_metrics.getLineHeight()*0.5f, 0.0f);
+    bx::mtxMul(model_matrix, model_matrix, translation);
 
-    bgfx::setTransform(glm::value_ptr(model_matrix));
+    bgfx::setTransform(model_matrix);
 
     m_textBufferManager->submitTextBuffer(m_scrollableBuffer, 1);
 
-    bgfx::setTransform(glm::value_ptr(model_matrix));
+    bgfx::setTransform(model_matrix);
     m_textBufferManager->submitTextBuffer(m_textBuffer, 1);
 
     if (bgfx::isValid(textureHandle)) {
         bgfx::setTexture(0, MeshBasicMaterial::u_texture, textureHandle);
     }
 
-    bgfx::setViewTransform(0, glm::value_ptr(view), glm::value_ptr(projection));
+    bgfx::setViewTransform(0, view_matrix, projection_matrix);
 
 	for (auto it = nodes.begin(); it != nodes.end(); ++it) {
         Node node = *it;
-        bgfx::setTransform(glm::value_ptr(node.model_matrix));           
+        bgfx::setTransform(node.model_matrix);           
 
         bgfx::setVertexBuffer(0, node.vbh);
         bgfx::setIndexBuffer(node.ibh);
@@ -132,36 +128,51 @@ void renderFrame() {
     bgfx::frame();
 }
 
-glm::vec3 getWorldPositionByNdc(float x, float y) {
-	glm::vec4 worldPosition = viewInverse * projectionInverse * glm::vec4(x, y, 0.0f, 1.0f);
-	return glm::vec3(worldPosition.x, worldPosition.y, 0.) / worldPosition.w;
+bx::Vec3 getWorldPositionByNdc(float x, float y) {
+    float vec[4] = {x, y, 0.0f, 1.0f};
+    float result[4];
+    bx::vec4MulMtx(result, vec, projectionInverse_matrix);
+    bx::vec4MulMtx(result, result, viewInverse_matrix);
+	return bx::Vec3{result[0] / result[3], result[1] / result[3], 0.0f};
 }
 
 void intersectNode(float x, float y) {
-	glm::vec3 target = getWorldPositionByNdc(x, y);
+	bx::Vec3 target = getWorldPositionByNdc(x, y);
     bool found = false;
     for (const Node& node : nodes) {
         for (int i = 0; i < 2; i++) { 
-            glm::vec3 v1 = glm::vec3(node.model_matrix * glm::vec4(
+            float vec1[4] = {
                 PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3] * 5],
                 PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3] * 5 + 1],
                 PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3] * 5 + 2],
-                1.0f)
-            );
-			glm::vec3 v2 = glm::vec3(node.model_matrix * glm::vec4(
-				PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 1] * 5],
-				PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 1] * 5 + 1],
-				PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 1] * 5 + 2],
-				1.0f)
-			); 
-            glm::vec3 v3 = glm::vec3(node.model_matrix * glm::vec4(
+                1.0f
+            };
+            float result1[4];
+            bx::vec4MulMtx(result1, vec1, node.model_matrix);
+            bx::Vec3 v1 = {result1[0] / result1[3], result1[1] / result1[3], result1[2] / result1[3]};
+            
+            float vec2[4] = {
+                PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 1] * 5],
+                PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 1] * 5 + 1],
+                PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 1] * 5 + 2],
+                1.0f
+            };
+            float result2[4];
+            bx::vec4MulMtx(result2, vec2, node.model_matrix);
+            bx::Vec3 v2 = {result2[0] / result2[3], result2[1] / result2[3], result2[2] / result2[3]};
+            
+            float vec3[4] = {
                 PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 2] * 5],
                 PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 2] * 5 + 1],
                 PlaneGeometry::PosTexCoord0Vertex[PlaneGeometry::indices[i * 3 + 2] * 5 + 2],
-                1.0f)
-            );
+                1.0f
+            };
+            float result3[4];
+            bx::vec4MulMtx(result3, vec3, node.model_matrix);
+            bx::Vec3 v3 = {result3[0] / result3[3], result3[1] / result3[3], result3[2] / result3[3]};
+            
 			float u, v, t;
-            found = Utils::rayIntersect(v1, v2, v3, Ray{glm::vec3(target.x,target.y,eye.z),glm::vec3(0,0,-1)}, u, v, t);
+            found = Utils::rayIntersect(v1, v2, v3, Ray{{target.x, target.y, 5}, {0, 0, -1}}, u, v, t);
             if (found) {
                 printf("Intersected: %d, u: %f, v: %f, t: %f\n", found, u, v, t);
                 break;
@@ -177,10 +188,6 @@ void onWindowResize(int width, int height) {
     screenWidth = width;
     screenHeight = height;
 
-    aspectRatio = (float)screenWidth / (float)screenHeight;
-    projection = glm::ortho(-(FIXED_WORLD_HEIGHT * aspectRatio / 2.0f), FIXED_WORLD_HEIGHT * aspectRatio / 2.0f, -(FIXED_WORLD_HEIGHT / 2.0f), FIXED_WORLD_HEIGHT / 2.0f, .1f, 1000.0f);
-    textProjection = glm::ortho(-(FIXED_WORLD_HEIGHT * aspectRatio / 2.0f), FIXED_WORLD_HEIGHT * aspectRatio / 2.0f, (FIXED_WORLD_HEIGHT / 2.0f), -FIXED_WORLD_HEIGHT / 2.0f, .1f, 1000.0f);
-
     bgfx::reset(screenWidth, screenHeight, BGFX_RESET_VSYNC);
     bgfx::setViewRect(0, 0, 0, screenWidth, screenHeight);
 }
@@ -188,13 +195,19 @@ void onWindowResize(int width, int height) {
 void addNodeByScreenXY(emscripten::val input_x_val, emscripten::val input_y_val, int order) {
 	float input_x = input_x_val.as<float>();
 	float input_y = input_y_val.as<float>();
-	glm::vec3 worldPosition = getWorldPositionByNdc(input_x, input_y);
+	bx::Vec3 worldPosition = getWorldPositionByNdc(input_x, input_y);
 	Node node(
         PlaneGeometry::vbh, 
         PlaneGeometry::ibh, 
         MeshBasicMaterial::program, 
         MeshBasicMaterial::u_texture);
-	node.model_matrix = glm::translate(glm::mat4(1.0f), worldPosition);
+	
+	float identity[16];
+	bx::mtxIdentity(identity);
+	float translation[16];
+	bx::mtxTranslate(translation, worldPosition.x, worldPosition.y, worldPosition.z);
+	bx::mtxMul(node.model_matrix, identity, translation);
+	
     node.order = order;
 	nodes.insert(node);
 }
@@ -301,7 +314,15 @@ void applyTextBufferAttributes()
 	m_textBufferManager->setTextColor(m_textBuffer, 0xFFFFFFFF);
 }
 
-int main(int argc, char **argv)
+emscripten::val allocateMatrix() {
+    emscripten::val result = emscripten::val::object();
+    result.set("view_matrix", reinterpret_cast<uintptr_t>(view_matrix));
+    result.set("projection_matrix", reinterpret_cast<uintptr_t>(projection_matrix));
+    result.set("textProjection_matrix", reinterpret_cast<uintptr_t>(textProjection_matrix));
+    return result;
+}
+
+void init()
 {
 
     bgfx::PlatformData platformData{};
@@ -352,7 +373,7 @@ int main(int argc, char **argv)
     m_textBufferManager->appendText(m_textBuffer, m_fontScaled, m_textBegin1, m_textEnd1);
     m_textBufferManager->appendText(m_scrollableBuffer, m_fontScaled, m_textBegin, m_textEnd);
 
-    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x443355FF, 1.0f, 0);
+    bgfx::setViewClear(0, BGFX_CLEAR_NONE, 0x443355FF, 1.0f, 0);
     bgfx::setViewRect(0, 0, 0, screenWidth, screenHeight);
 
     bgfx::setViewClear(1, BGFX_CLEAR_NONE, 0x443355FF, 1.0f, 0);
@@ -374,7 +395,12 @@ int main(int argc, char **argv)
         bgfx::UniformType::Sampler
     );
 
-    emscripten_set_main_loop(renderFrame, 0, 0);
+    view_matrix = static_cast<float*>(malloc(16*sizeof(float)));
+    projection_matrix = static_cast<float*>(malloc(16*sizeof(float)));
+    textProjection_matrix = static_cast<float*>(malloc(16*sizeof(float)));
+
+    // 注意：渲染循环现在由JavaScript控制，不再使用emscripten_set_main_loop
+    // emscripten_set_main_loop(renderFrame, 0, 0);
 }
 
 EMSCRIPTEN_BINDINGS(GSBD) {
@@ -382,4 +408,6 @@ EMSCRIPTEN_BINDINGS(GSBD) {
     emscripten::function("onWindowResize", &onWindowResize);
 	emscripten::function("intersectNode", &intersectNode);
 	emscripten::function("renderFrame", &renderFrame);
+    emscripten::function("allocateMatrix", &allocateMatrix);
+    emscripten::function("init", &init);
 }

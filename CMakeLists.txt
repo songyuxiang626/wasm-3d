@@ -26,7 +26,6 @@ include_directories(${BGFX_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/bx/include)
 include_directories(${CMAKE_SOURCE_DIR}/bimg/include)
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty)
-include_directories(${CMAKE_SOURCE_DIR}/glm/glm)
 
 add_definitions(-DBX_CONFIG_DEBUG)
 
@@ -55,7 +54,7 @@ if(DEFINED ENV{EMSDK})
         -s FETCH=1 \
         -static \
         -s ALLOW_MEMORY_GROWTH=1 \
-        -s EXIT_RUNTIME=1\
+        -s NO_EXIT_RUNTIME=1 \
         -sASSERTIONS")
 
     target_link_libraries(wasm-3d
