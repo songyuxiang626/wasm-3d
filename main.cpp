@@ -378,7 +378,7 @@ int main(int argc, char **argv)
         bgfx::UniformType::Sampler
     );
 
-    //emscripten_set_main_loop(renderFrame, 0, 0);
+    emscripten_set_main_loop(renderFrame, 0, 0);
 }
 
 EMSCRIPTEN_BINDINGS(GSBD) {
