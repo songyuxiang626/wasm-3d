@@ -1,12 +1,15 @@
 [submodule "bgfx"]
 	path = bgfx
 	url = https://github.com/bkaradzic/bgfx.git
+	branch = 379fc70
 [submodule "bx"]
 	path = bx
 	url = https://github.com/bkaradzic/bx.git
+	branch = 8832707
 [submodule "bimg"]
 	path = bimg
 	url = https://github.com/bkaradzic/bimg.git
+	branch = 663f724
 [submodule "glm"]
 	path = glm
 	url = https://github.com/g-truc/glm.git
