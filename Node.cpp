@@ -1,4 +1,4 @@
-#include <glm/glm.hpp>
+#include <glm.hpp>
 #include <bgfx/bgfx.h>
 
 class Node {

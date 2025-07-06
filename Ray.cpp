@@ -1,4 +1,4 @@
-#include <glm/glm.hpp>
+#include <glm.hpp>
 #pragma once
 
 class Ray {
