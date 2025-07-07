@@ -32,21 +32,172 @@
 
 <head>
     <title>bgfx-glfw-wasm-3dcube-template-starting-point</title>
+    
 </head>
 
 <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <canvas id="canvas" style="width: 100%; height: 100%;"></canvas>
     <div id="moduleStatusString">Downloading bgfx-glfw-wasm-3dcube-template-starting-point...</div>
     <script type="text/javascript">
+        let scene, camera, renderer, textCamera;
         let canvas = document.getElementById("canvas");
+
+        function initThreeJS() {
+
+            let canvas = document.getElementById("canvas");
+
+            scene = new THREE.Scene();
+
+            renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                alpha: true,
+                antialias: true,
+                preserveDrawingBuffer: true  // 保持绘制缓冲区，避免与 BGFX 冲突
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0); // 透明背景
+
+            // 创建正交相机
+            const aspectRatio = window.innerWidth / window.innerHeight;
+            const frustumSize = 100;
+            camera = new THREE.OrthographicCamera(
+                frustumSize * aspectRatio / -2,
+                frustumSize * aspectRatio / 2,
+                frustumSize / 2,
+                frustumSize / -2,
+                0.1,
+                1000
+            );
+
+            textCamera = new THREE.OrthographicCamera(
+                frustumSize * aspectRatio / -2,
+                frustumSize * aspectRatio / 2,
+                frustumSize / -2,
+                frustumSize / 2,
+                0.1,
+                1000
+            );
+
+            // 设置相机位置
+            camera.position.set(0, 0, 5);
+            camera.lookAt(0, 0, 0);
+
+            textCamera.position.set(0, 0, 5);
+            textCamera.lookAt(0, 0, 0);
+
+            // 添加一些测试几何体
+            const geometry = new THREE.BoxGeometry(20, 20, 20);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x00ff00,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.8
+            });
+            const cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            // 添加更多测试对象
+            const sphereGeometry = new THREE.SphereGeometry(15, 16, 16);
+            const sphereMaterial = new THREE.MeshBasicMaterial({
+                color: 0xff0000,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.6
+            });
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.position.set(2, 0, 0);
+            scene.add(sphere);
+
+            const sphereGeometry1 = new THREE.SphereGeometry(25, 16, 16);
+            const sphereMaterial1 = new THREE.MeshBasicMaterial({
+                color: 0x0000ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.6
+            });
+            const sphere1 = new THREE.Mesh(sphereGeometry1, sphereMaterial1);
+            sphere1.position.set(-2, 0, 0);  // 改为不同的位置，避免重叠
+            scene.add(sphere1);
+
+            console.log("Three.js initialized with shared canvas");
+        }
+
+        // 同步bgfx矩阵的函数
+        function syncBGFXMatrices() {
+            if (Module) {
+                view_matrix.set(camera.matrixWorldInverse.elements);
+                projection_matrix.set(camera.projectionMatrix.elements);
+                textProjection_matrix.set(textCamera.projectionMatrix.elements);
+            }
+        }
+
+        // 重写的窗口大小调整函数
+        function onWindowResize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            // 更新canvas大小
+            canvas.width = width;
+            canvas.height = height;
+
+            if (renderer) {
+                renderer.setSize(width, height);
+            }
+
+            // 更新Three.js相机
+            if (camera) {
+                const aspectRatio = width / height;
+                const frustumSize = 100;
+                camera.left = frustumSize * aspectRatio / -2;
+                camera.right = frustumSize * aspectRatio / 2;
+                camera.top = frustumSize / 2;
+                camera.bottom = frustumSize / -2;
+                camera.updateProjectionMatrix();
+            }
+
+            if (textCamera) {
+                const aspectRatio = width / height;
+                const frustumSize = 100;
+                textCamera.left = frustumSize * aspectRatio / -2;
+                textCamera.right = frustumSize * aspectRatio / 2;
+                textCamera.top = frustumSize / -2;
+                textCamera.bottom = frustumSize / 2;
+                textCamera.updateProjectionMatrix();
+            }
+
+            // 调用bgfx的窗口大小调整
+            if (Module && Module.onWindowResize) {
+                Module.onWindowResize(width, height);
+            }
+
+            syncBGFXMatrices();
+        }
         // make the canvas fullscreen
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         canvas.oncontextmenu = (e) => {
             e.preventDefault();
         }
+        function renderThreeJS() {
+            if (!renderer || !scene || !camera) return;
+
+            // 确保渲染器状态正确
+            renderer.setClearColor(0x000000, 0); // 透明背景
+            
+            // 强制更新场景中所有对象的世界矩阵
+            scene.traverse((object) => {
+                if (object.isMesh) {
+                    object.updateMatrixWorld(true);
+                }
+            });
+            
+            // 渲染场景
+            renderer.render(scene, camera);
+        }
         let statusElement = document.getElementById('moduleStatusString');
         var downloadingSymbolRightArrow = false;
+        let init = false;
         var Module = {
             setStatus: function (text) {
                 try {
@@ -65,56 +216,89 @@
                         let outputString = "BGFX Emscripten Resources Downloading...<br>" + downloadingSymbol + " " + downloaded.toFixed(2).toString() + " MB / " + total.toFixed(2).toString() + " MB " + progress;
                         statusElement.innerHTML = outputString;
                         if (percent > 99 && statusElement.style.display != "none") {
-                            statusElement.style.display = "none";
-                            canvas.style.display = "block";
 
-                            //Module.onWindowResize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
 
-                            const mousedownEvent = (event) => {
-                                const rect = canvas?.getBoundingClientRect()
+                            function renderLoop() {
 
-                                if (rect) {
-                                    const x = event.clientX - rect.left
-                                    const y = event.clientY - rect.top
+                                if (Module.init && !init) {
+                                    init = true;
+                                    statusElement.style.display = "none";
+                                    canvas.style.display = "block";
 
-                                    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-                                        const p = {
-                                            x: (x / canvas.width) * 2 - 1,
-                                            y: -(y / canvas.height) * 2 + 1,
+                                    Module.init();
+
+                                    const inputAllocInfo = Module.allocateMatrix();
+                                    console.log("Matrix allocation result:", inputAllocInfo);
+
+                                    const wasmMemoryBuffer = Module.HEAPF32.buffer;
+                                    view_matrix = new Float32Array(wasmMemoryBuffer, inputAllocInfo.view_matrix, 16);
+                                    projection_matrix = new Float32Array(wasmMemoryBuffer, inputAllocInfo.projection_matrix, 16);
+                                    textProjection_matrix = new Float32Array(wasmMemoryBuffer, inputAllocInfo.textProjection_matrix, 16);
+
+                                    console.log("Matrix arrays created successfully");
+
+                                    initThreeJS();
+                                    syncBGFXMatrices();
+
+                                    //Module.onWindowResize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+
+                                    const mousedownEvent = (event) => {
+                                        const rect = canvas?.getBoundingClientRect()
+
+                                        if (rect) {
+                                            const x = event.clientX - rect.left
+                                            const y = event.clientY - rect.top
+
+                                            if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                                                const p = {
+                                                    x: (x / canvas.width) * 2 - 1,
+                                                    y: -(y / canvas.height) * 2 + 1,
+                                                }
+
+                                                Module.addNodeByScreenXY(p.x, p.y, Math.random() * 100);
+                                            }
                                         }
-
-                                        Module.addNodeByScreenXY(p.x, p.y, Math.random() * 100);
                                     }
-                                }
-                            }
 
-                            const mousemoveEvent = (event) => {
-                                const rect = canvas?.getBoundingClientRect()
+                                    const mousemoveEvent = (event) => {
+                                        const rect = canvas?.getBoundingClientRect()
 
-                                if (rect) {
-                                    const x = event.clientX - rect.left
-                                    const y = event.clientY - rect.top
+                                        if (rect) {
+                                            const x = event.clientX - rect.left
+                                            const y = event.clientY - rect.top
 
-                                    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-                                        const p = {
-                                            x: (x / canvas.width) * 2 - 1,
-                                            y: -(y / canvas.height) * 2 + 1,
+                                            if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                                                const p = {
+                                                    x: (x / canvas.width) * 2 - 1,
+                                                    y: -(y / canvas.height) * 2 + 1,
+                                                }
+
+                                                Module.intersectNode(p.x, p.y);
+                                            }
                                         }
-
-                                        Module.intersectNode(p.x, p.y);
                                     }
+                                    window.addEventListener('resize', onWindowResize);
+                                    canvas.addEventListener('mousedown', mousedownEvent, false)
+                                    canvas.addEventListener('mousemove', mousemoveEvent, false)
                                 }
+
+                                if (Module.renderFrame) {
+                                    // 确保 Three.js 状态干净
+                                    renderer.resetState();
+                                    
+                                    // 先渲染 Three.js
+                                    renderThreeJS();
+
+                                    renderer.resetState();
+                                    
+                                    // 再渲染 BGFX
+                                    Module.renderFrame();
+                                }
+
+                                requestAnimationFrame(renderLoop);
                             }
 
-                            const onWindowResize = () => {
-                                if (canvas.parentElement) {
-                                    Module.onWindowResize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
-                                }
-                            }
-
-                            window.addEventListener('resize', onWindowResize);
-                            canvas.addEventListener('mousedown', mousedownEvent, false)
-                            canvas.addEventListener('mousemove', mousemoveEvent, false)
+                            requestAnimationFrame(renderLoop);
                         }
                     }
                     else {
